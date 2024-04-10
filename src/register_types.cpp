@@ -1,6 +1,7 @@
 #include "register_types.h"
 
-#include "GameManager.h"
+// #include "GameManager.h"
+#include "InputInterface.h"
 
 #include <gdextension_interface.h>
 #include <godot_cpp/core/defs.hpp>
@@ -13,7 +14,8 @@ void initialize_example_module(ModuleInitializationLevel p_level) {
 		return;
 	}
 
-	ClassDB::register_class<GameManager>();
+	// ClassDB::register_class<GameManager>();
+	ClassDB::register_class<InputInterface>();
 }
 
 void uninitialize_example_module(ModuleInitializationLevel p_level) {
