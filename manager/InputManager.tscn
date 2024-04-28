@@ -1,0 +1,17 @@
+[gd_scene load_steps=4 format=3 uid="uid://cmyilv2vnglpf"]
+
+[ext_resource type="Script" path="res://manager/InputManager.gd" id="1_7yq11"]
+[ext_resource type="PackedScene" uid="uid://drbh6dkcniacj" path="res://tile/tile_map.tscn" id="2_g7yc8"]
+[ext_resource type="PackedScene" uid="uid://dkkwjemh14pl1" path="res://icon/icon.tscn" id="3_sg4c5"]
+
+[node name="InputManager" type="Node2D"]
+script = ExtResource("1_7yq11")
+
+[node name="tile_map" parent="." instance=ExtResource("2_g7yc8")]
+position = Vector2(550, 347)
+
+[node name="Icon" parent="." instance=ExtResource("3_sg4c5")]
+position = Vector2(674, 439)
+
+[node name="Icon2" parent="." instance=ExtResource("3_sg4c5")]
+position = Vector2(719, 439)

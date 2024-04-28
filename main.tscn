@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=3 uid="uid://brfh3bi8e2hyq"]
+
+[ext_resource type="Script" path="res://main.gd" id="1_hbdnl"]
+[ext_resource type="PackedScene" uid="uid://drbh6dkcniacj" path="res://tile/tile_map.tscn" id="1_wvqtr"]
+[ext_resource type="PackedScene" uid="uid://bm5dsqlvolerv" path="res://player/Player.tscn" id="2_7oo13"]
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_hbdnl")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(215, 129)
+zoom = Vector2(2, 2)
+
+[node name="tile_map" parent="." instance=ExtResource("1_wvqtr")]
+unique_name_in_owner = true
+position = Vector2(2.08165e-12, 2.08165e-12)
+
+[node name="Player" parent="." instance=ExtResource("2_7oo13")]
+position = Vector2(199, 212)

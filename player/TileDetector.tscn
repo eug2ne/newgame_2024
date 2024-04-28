@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://cbrwm75spq3an"]
+
+[ext_resource type="Script" path="res://player/TileDetector.gd" id="1_vecbg"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ai1q7"]
+radius = 12.0
+
+[node name="TileDetector" type="Area2D"]
+collision_layer = 4
+collision_mask = 4
+script = ExtResource("1_vecbg")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -3)
+shape = SubResource("CapsuleShape2D_ai1q7")
+
+[connection signal="body_shape_entered" from="." to="." method="_on_body_shape_entered"]
