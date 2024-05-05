@@ -1,9 +1,10 @@
-[gd_scene load_steps=34 format=3 uid="uid://bm5dsqlvolerv"]
+[gd_scene load_steps=35 format=3 uid="uid://bm5dsqlvolerv"]
 
 [ext_resource type="Script" path="res://player/Player.gd" id="1_2r1ma"]
 [ext_resource type="Texture2D" uid="uid://cqbeyncp834mm" path="res://assets/spritesheets/player.png" id="1_peccd"]
 [ext_resource type="Script" path="res://player/AnimationPlayer.gd" id="3_d85x8"]
 [ext_resource type="PackedScene" uid="uid://cbrwm75spq3an" path="res://player/TileDetector.tscn" id="4_wh0r1"]
+[ext_resource type="PackedScene" uid="uid://c1yqi4yeohbec" path="res://player/speech_bubble/SpeechBubble.tscn" id="5_28vti"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_507og"]
 radius = 8.0
@@ -355,20 +356,23 @@ _data = {
 
 [node name="Player" type="CharacterBody2D"]
 z_index = 10
+position = Vector2(2.08165e-12, 2.08165e-12)
 collision_layer = 2
 script = ExtResource("1_2r1ma")
 
 [node name="TileDetector" parent="." instance=ExtResource("4_wh0r1")]
-position = Vector2(0, -1)
+position = Vector2(0, -12)
 
 [node name="PlayerBody" type="CollisionShape2D" parent="."]
+position = Vector2(0, -11)
 shape = SubResource("CapsuleShape2D_507og")
 
 [node name="PlayerHitArea" type="CollisionShape2D" parent="."]
+position = Vector2(0, -11)
 shape = SubResource("CapsuleShape2D_8aapq")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
-position = Vector2(0, -5)
+position = Vector2(0, -16)
 sprite_frames = SubResource("SpriteFrames_dyi5b")
 animation = &"idle"
 
@@ -378,14 +382,9 @@ libraries = {
 }
 script = ExtResource("3_d85x8")
 
-[node name="Navigation" type="Node2D" parent="."]
-
-[node name="NavigationAgent2D" type="NavigationAgent2D" parent="Navigation"]
-path_desired_distance = 5.0
-debug_enabled = true
-
-[node name="Timer" type="Timer" parent="Navigation"]
+[node name="SpeechBubble" parent="." instance=ExtResource("5_28vti")]
+offset_top = -64.0
+offset_bottom = -31.0
 
 [connection signal="_tile_entered" from="TileDetector" to="." method="_on_tile_detector__tile_entered"]
 [connection signal="animation_finished" from="AnimationPlayer" to="AnimationPlayer" method="_on_animation_finished"]
-[connection signal="timeout" from="Navigation/Timer" to="." method="_on_timer_timeout"]

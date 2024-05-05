@@ -17,3 +17,4 @@ position = Vector2(2.08165e-12, 2.08165e-12)
 
 [node name="Player" parent="." instance=ExtResource("2_7oo13")]
 position = Vector2(199, 212)
+floor_stop_on_slope = false
