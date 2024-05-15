@@ -5,13 +5,6 @@ extends MarginContainer
 
 const MAX_WIDTH = 256
 
-var text = ""
-var letter_index = 0
-
-var letter_time = 0.03
-var space_time = 0.06
-var punc_time = 0.2
-
 signal _finish_displaying()
 
 # TODO: set visible to false on _ready()
@@ -22,7 +15,16 @@ func _ready():
 	visible = false
 
 func _display_text(display_text):
-	text = display_text
+	if visible:
+		# reset label
+		label.text = ""
+	
+		custom_minimum_size.x = 0
+		await resized
+		
+		visible = false
+	
+	visible = true
 	label.text = display_text
 	
 	await resized
@@ -34,3 +36,13 @@ func _display_text(display_text):
 		await resized # wait for x resize
 		await resized # wait for y resize
 		custom_minimum_size.y = size.y
+	
+	timer.start(2)
+
+func _on_letter_display_timer_timeout():
+	label.text = ""
+	
+	custom_minimum_size.x = 0
+	await resized
+	
+	visible = false

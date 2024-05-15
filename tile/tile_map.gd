@@ -44,58 +44,97 @@ func update_astar(navigatable: bool, player_pos: Vector2):
 				if get_cell_tile_data(2, coord) and not get_cell_tile_data(1, coord):
 					# disable navigatable cells exclusively
 					astar.set_point_solid(coord)
-					
-				# TODO: update icon image
+				
 				# switch icon image according to player_pos
 				get_tree().call_group("Icons", "switch_image", player_pos)
 
-func check_icon_click(click_pos):
+func check_icon_click():
 	for i in icons:
 		# check click_pos within icon area
 		if i.in_area:
-			return true
+			return i
 			
 	return false
-
-# externally called functions
-func _get_current_path(current_pos, target_pos) -> Array[Vector2i]:
-	var current_coord = local_to_map(current_pos)
-	var target_coord = local_to_map(target_pos)
+	
+func get_target_coord(current_coord, click_coord):
+	# convert target_coord to naivgation-tile coord
+	if get_cell_tile_data(0, click_coord).get_collision_polygons_count(0) == 1:
+		# click on background tile
+		click_coord.y -= 1
+		return click_coord
+	
 	
 	# check icon click
-	var icon_click = check_icon_click(target_pos)
-	# convert target_pos to closest navigation-tile position
-	var tile_navigatable = get_cell_tile_data(1, target_coord)
+	var icon = check_icon_click()
+	var search_tiles = [
+		click_coord,
+		Vector2i(click_coord.x-1, click_coord.y),
+		Vector2i(click_coord.x+1, click_coord.y)
+	]
+	# search closest navigation-tile
+	var tile_navigatable = search_tiles.any(func(coord): return get_cell_tile_data(1, coord))
 	while !tile_navigatable:
-		if icon_click:
-			if current_coord.y > target_coord.y:
+		if icon:
+			if current_coord.y > click_coord.y:
 				# player move up
-				target_coord.y -= 1
+				click_coord.y -= 1
 			else:
 				# player move down
-				target_coord.y += 1
+				click_coord.y += 1
 		else:
-			target_coord.y += 1
-		tile_navigatable = get_cell_tile_data(1, target_coord)
+			click_coord.y += 1
 		
+		search_tiles = [
+			click_coord,
+			Vector2i(click_coord.x-1, click_coord.y),
+			Vector2i(click_coord.x+1, click_coord.y)
+		] # update search-tiles
+		tile_navigatable = search_tiles.any(func(coord): return get_cell_tile_data(1, coord))
+		
+	search_tiles = search_tiles.filter(func(coord): return get_cell_tile_data(1, coord))
+	click_coord = search_tiles[0]
+	
+	if icon:
+		if current_coord.y > click_coord.y:
+			# player move up
+			click_coord += icon.destination_up
+		else:
+			# player move down
+			click_coord += icon.destination_down
+	
+	return click_coord
+
+# externally called functions
+func _pos_accessible(click_pos) -> bool:
+	# check accessibility of position
+	var click_coord = local_to_map(click_pos)
+	var accessible = astar.is_in_bounds(click_coord.x, click_coord.y)
+	
+	return accessible
+
+func _get_current_path(current_pos, click_pos) -> Array[Vector2i]:
+	var current_coord = local_to_map(current_pos)
+	var click_coord = local_to_map(click_pos)
+	
+	# check icon click
+	var icon = check_icon_click()
+	# convert click_pos to closest navigation-tile position
+	var target_coord = get_target_coord(current_coord, click_coord)
+	
 	if target_coord.y != current_coord.y:
 		# update navigation map
 		update_astar(true, current_coord)
-		
-		# convert target_pos to closest navigation-tile position
-		tile_navigatable = get_cell_tile_data(1, target_coord)
-		while !tile_navigatable:
-			if target_pos.y < current_pos.y:
-				# player moving up
-				target_coord.y -= 1
-			else:
-				# player moving down
-				target_coord.y += 1
-			tile_navigatable = get_cell_tile_data(1, target_coord)
 	
 	
 	var nav_pos = map_to_local(target_coord)
 	var path = astar.get_id_path(
+			local_to_map(current_pos),
+			local_to_map(nav_pos)
+		).slice(1)
+	if path.is_empty():
+		# update navigation map
+		update_astar(true, current_coord)
+		path = astar.get_id_path(
 			local_to_map(current_pos),
 			local_to_map(nav_pos)
 		).slice(1)

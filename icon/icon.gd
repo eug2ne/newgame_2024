@@ -1,8 +1,9 @@
 extends Area2D
 class_name Icon
 
-# TODO: need easier way to register tile data to icon
 @onready var sprite: Sprite2D = $Sprite2D
+@export var destination_up: Vector2i
+@export var destination_down: Vector2i
 var in_area: bool = false
 
 signal _icon_clicked(mouse_pos)
