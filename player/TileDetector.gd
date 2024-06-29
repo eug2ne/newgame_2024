@@ -19,6 +19,6 @@ func _process_tilemap_collision(body, body_rid):
 		emit_signal("_tile_entered", current_tile_type)
 		break
 
-func _on_body_shape_entered(body_rid, body, body_shape_index, local_shape_index):
+func _on_body_shape_entered(body_rid, body, _body_shape_index, _local_shape_index):
 	if body is TileMap:
 		_process_tilemap_collision(body, body_rid)

@@ -9,12 +9,12 @@ script = ExtResource("1_hbdnl")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(215, 129)
-zoom = Vector2(2, 2)
+zoom = Vector2(2.5, 2.5)
 
 [node name="tile_map" parent="." instance=ExtResource("1_wvqtr")]
 unique_name_in_owner = true
 position = Vector2(2.08165e-12, 2.08165e-12)
 
 [node name="Player" parent="." instance=ExtResource("2_7oo13")]
-position = Vector2(199, 212)
+position = Vector2(234, 138)
 floor_stop_on_slope = false

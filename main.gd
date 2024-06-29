@@ -31,4 +31,4 @@ func _input(event):
 		
 		# pass path, target_position to player
 		player.current_path = player_path
-		player.target_position = mouse_pos
+		player.target_position = tile_map._get_target_pos()

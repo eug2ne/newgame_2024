@@ -3,11 +3,17 @@ extends TileMap
 @onready var icons = get_tree().get_nodes_in_group("Icons")
 var astar: AStarGrid2D = AStarGrid2D.new()
 var zero: Vector2i = Vector2(22,25)
+var current_coord: Vector2
 var current_path: Array[Vector2i]
 
+var target_pos: Vector2:
+	set = _set_target_pos,
+	get = _get_target_pos
+var target_coord: Vector2i:
+	set = _set_target_coord,
+	get = _get_target_coord
+
 func _ready():
-	# disable physics on navigation layer
-	
 	# register navigation area
 	var tilemap_size = get_used_rect().end - get_used_rect().position
 	var tilemap_rect = Rect2i(Vector2i.ZERO, tilemap_size)
@@ -28,40 +34,20 @@ func _ready():
 				# disable path-finding
 				astar.set_point_solid(coord)
 
-# internally called functions
-func update_astar(navigatable: bool, player_pos: Vector2):
-	var tilemap_size = get_used_rect().end - get_used_rect().position
-	for x in tilemap_size.x:
-		for y in tilemap_size.y:
-			var coord = Vector2i(x,y)
-			if navigatable:
-				# enable path-finding on navigatable cells
-				if get_cell_tile_data(2, coord):
-					astar.set_point_solid(coord, false)
-			
-			else:
-				# disable path-finding on navigatable cells
-				if get_cell_tile_data(2, coord) and not get_cell_tile_data(1, coord):
-					# disable navigatable cells exclusively
-					astar.set_point_solid(coord)
-				
-				# switch icon image according to player_pos
-				get_tree().call_group("Icons", "switch_image", player_pos)
-
-func check_icon_click():
-	for i in icons:
-		# check click_pos within icon area
-		if i.in_area:
-			return i
-			
-	return false
+# setter, getter
+func _set_target_pos(click_pos: Vector2) -> void:
+	target_pos = click_pos
 	
-func get_target_coord(current_coord, click_coord):
+func _get_target_pos() -> Vector2:
+	return target_pos
+
+func _set_target_coord(click_coord: Vector2i) -> void:
 	# convert target_coord to naivgation-tile coord
 	if get_cell_tile_data(0, click_coord).get_collision_polygons_count(0) == 1:
 		# click on background tile
 		click_coord.y -= 1
-		return click_coord
+		target_coord = click_coord
+		return
 	
 	
 	# check icon click
@@ -101,8 +87,43 @@ func get_target_coord(current_coord, click_coord):
 		else:
 			# player move down
 			click_coord += icon.destination_down
+			
+		# update target_pos
+		var click_pos_update = map_to_local(click_coord)
+		_set_target_pos(click_pos_update)
 	
-	return click_coord
+	target_coord = click_coord
+	
+func _get_target_coord() -> Vector2i:
+	return target_coord
+
+# internally called functions
+func update_astar(navigatable: bool, player_pos: Vector2):
+	var tilemap_size = get_used_rect().end - get_used_rect().position
+	for x in tilemap_size.x:
+		for y in tilemap_size.y:
+			var coord = Vector2i(x,y)
+			if navigatable:
+				# enable path-finding on navigatable cells
+				if get_cell_tile_data(2, coord):
+					astar.set_point_solid(coord, false)
+			
+			else:
+				# disable path-finding on navigatable cells
+				if get_cell_tile_data(2, coord) and not get_cell_tile_data(1, coord):
+					# disable navigatable cells exclusively
+					astar.set_point_solid(coord)
+				
+				# switch icon image according to player_pos
+				get_tree().call_group("Icons", "switch_image", player_pos)
+
+func check_icon_click():
+	for i in icons:
+		# check click_pos within icon area
+		if i.in_area:
+			return i
+			
+	return false
 
 # externally called functions
 func _pos_accessible(click_pos) -> bool:
@@ -113,13 +134,14 @@ func _pos_accessible(click_pos) -> bool:
 	return accessible
 
 func _get_current_path(current_pos, click_pos) -> Array[Vector2i]:
-	var current_coord = local_to_map(current_pos)
+	current_coord = local_to_map(current_pos)
 	var click_coord = local_to_map(click_pos)
+	# set target_pos to click_pos
+	_set_target_pos(click_pos)
 	
-	# check icon click
-	var icon = check_icon_click()
 	# convert click_pos to closest navigation-tile position
-	var target_coord = get_target_coord(current_coord, click_coord)
+	_set_target_coord(click_coord)
+	target_coord = _get_target_coord()
 	
 	if target_coord.y != current_coord.y:
 		# update navigation map

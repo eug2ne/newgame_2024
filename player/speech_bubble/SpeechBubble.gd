@@ -7,7 +7,6 @@ const MAX_WIDTH = 256
 
 signal _finish_displaying()
 
-# TODO: set visible to false on _ready()
 # TODO: set visible to true when displaying text >> set visible to false after timer end
 
 func _ready():
@@ -15,6 +14,7 @@ func _ready():
 	visible = false
 
 func _display_text(display_text):
+	# set visible to true when displaying text
 	if visible:
 		# reset label
 		label.text = ""
@@ -40,6 +40,7 @@ func _display_text(display_text):
 	timer.start(2)
 
 func _on_letter_display_timer_timeout():
+	# set visible to false after timer end
 	label.text = ""
 	
 	custom_minimum_size.x = 0
