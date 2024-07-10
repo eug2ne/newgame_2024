@@ -1,4 +1,4 @@
-[gd_scene load_steps=75 format=3 uid="uid://bm5dsqlvolerv"]
+[gd_scene load_steps=76 format=3 uid="uid://bm5dsqlvolerv"]
 
 [ext_resource type="Script" path="res://player/Player.gd" id="1_2r1ma"]
 [ext_resource type="Script" path="res://player/AnimationPlayer.gd" id="3_d85x8"]
@@ -17,6 +17,7 @@
 [ext_resource type="Script" path="res://machines/state machine/states/ClimbState.gd" id="15_568s0"]
 [ext_resource type="Script" path="res://machines/state machine/states/SlideState.gd" id="16_gkrci"]
 [ext_resource type="Script" path="res://machines/state machine/states/RollState.gd" id="17_2kddk"]
+[ext_resource type="Script" path="res://machines/navigation machine/NavigationMachine.gd" id="18_c8qdp"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_507og"]
 radius = 7.0
@@ -630,11 +631,11 @@ script = ExtResource("1_2r1ma")
 [node name="TileDetector" parent="." instance=ExtResource("4_wh0r1")]
 position = Vector2(0, -12)
 
-[node name="PlayerBody" type="CollisionShape2D" parent="."]
+[node name="Body" type="CollisionShape2D" parent="."]
 position = Vector2(0, -10)
 shape = SubResource("CapsuleShape2D_507og")
 
-[node name="PlayerHitArea" type="CollisionShape2D" parent="."]
+[node name="HitArea" type="CollisionShape2D" parent="."]
 position = Vector2(-2.08165e-12, -15)
 shape = SubResource("CapsuleShape2D_8aapq")
 
@@ -653,34 +654,58 @@ script = ExtResource("3_d85x8")
 offset_top = -72.0
 offset_bottom = -39.0
 
-[node name="Timer" type="Timer" parent="."]
-one_shot = true
+[node name="NavigationMachine" type="Node" parent="." node_paths=PackedStringArray("parent")]
+script = ExtResource("18_c8qdp")
+parent = NodePath("..")
 
-[node name="StateMachine" type="Node" parent="." node_paths=PackedStringArray("current_state", "character")]
+[node name="StateMachine" type="Node" parent="." node_paths=PackedStringArray("current_state", "parent")]
 script = ExtResource("12_7chlf")
 current_state = NodePath("Idle")
-character = NodePath("..")
+parent = NodePath("..")
 
-[node name="Idle" type="Node" parent="StateMachine"]
+[node name="Label" type="Label" parent="StateMachine"]
+offset_right = 49.0
+offset_bottom = 23.0
+text = "State: "
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Idle" type="Node" parent="StateMachine" node_paths=PackedStringArray("nav_machine")]
 script = ExtResource("13_y7ds4")
+nav_machine = NodePath("../../NavigationMachine")
 anim_key = "idle"
 
-[node name="Move" type="Node" parent="StateMachine"]
+[node name="Move" type="Node" parent="StateMachine" node_paths=PackedStringArray("idle_state", "climb_state", "slide_state", "roll_state")]
 script = ExtResource("14_u66ym")
-anim_key = "walk"
 fast_anim_key = "run"
+idle_state = NodePath("../Idle")
+climb_state = NodePath("../Climb")
+slide_state = NodePath("../Slide")
+roll_state = NodePath("../Roll")
+anim_key = "walk"
 
-[node name="Climb" type="Node" parent="StateMachine"]
+[node name="Climb" type="Node" parent="StateMachine" node_paths=PackedStringArray("move_state")]
 script = ExtResource("15_568s0")
+move_state = NodePath("../Move")
 anim_key = "climb"
 
-[node name="Slide" type="Node" parent="StateMachine"]
+[node name="Slide" type="Node" parent="StateMachine" node_paths=PackedStringArray("idle_state")]
 script = ExtResource("16_gkrci")
+idle_state = NodePath("../Idle")
 anim_key = "slide"
 
-[node name="Roll" type="Node" parent="StateMachine"]
+[node name="Roll" type="Node" parent="StateMachine" node_paths=PackedStringArray("idle_state")]
 script = ExtResource("17_2kddk")
+idle_state = NodePath("../Idle")
 anim_key = "roll"
 
+[node name="RollTimer" type="Timer" parent="StateMachine/Roll"]
+one_shot = true
+
 [connection signal="_tile_entered" from="TileDetector" to="." method="_on_tile_detector__tile_entered"]
-[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
+[connection signal="Transition" from="StateMachine/Idle" to="StateMachine" method="_set_current_state"]
+[connection signal="Transition" from="StateMachine/Move" to="StateMachine" method="_set_current_state"]
+[connection signal="Transition" from="StateMachine/Climb" to="StateMachine" method="_set_current_state"]
+[connection signal="Transition" from="StateMachine/Slide" to="StateMachine" method="_set_current_state"]
+[connection signal="Transition" from="StateMachine/Roll" to="StateMachine" method="_set_current_state"]
+[connection signal="timeout" from="StateMachine/Roll/RollTimer" to="StateMachine/Roll" method="_on_roll_timer_timeout"]
