@@ -626,6 +626,8 @@ _data = {
 z_index = 10
 collision_layer = 2
 collision_mask = 3
+platform_floor_layers = 4294901761
+platform_wall_layers = 1
 script = ExtResource("1_2r1ma")
 
 [node name="TileDetector" parent="." instance=ExtResource("4_wh0r1")]
@@ -658,8 +660,9 @@ offset_bottom = -39.0
 script = ExtResource("18_c8qdp")
 parent = NodePath("..")
 
-[node name="StateMachine" type="Node" parent="." node_paths=PackedStringArray("current_state", "parent")]
+[node name="StateMachine" type="Node" parent="." node_paths=PackedStringArray("nav_machine", "current_state", "parent")]
 script = ExtResource("12_7chlf")
+nav_machine = NodePath("../NavigationMachine")
 current_state = NodePath("Idle")
 parent = NodePath("..")
 
@@ -703,6 +706,7 @@ anim_key = "roll"
 one_shot = true
 
 [connection signal="_tile_entered" from="TileDetector" to="." method="_on_tile_detector__tile_entered"]
+[connection signal="animation_finished" from="AnimationPlayer" to="StateMachine/Slide" method="_on_animation_finished"]
 [connection signal="Transition" from="StateMachine/Idle" to="StateMachine" method="_set_current_state"]
 [connection signal="Transition" from="StateMachine/Move" to="StateMachine" method="_set_current_state"]
 [connection signal="Transition" from="StateMachine/Climb" to="StateMachine" method="_set_current_state"]

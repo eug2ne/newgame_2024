@@ -6,6 +6,7 @@ extends CharacterBody2D
 @onready var state_machine: StateMachine = $StateMachine
 @onready var nav_machine: NavigationMachine = $NavigationMachine
 
+var GRAVITY = ProjectSettings.get_setting("physics/2d/default_gravity")
 const ROLL_DISTANCE = 90
 
 func _ready():
@@ -54,13 +55,13 @@ func _input(event):
 		state_machine._set_current_state("Roll")
 
 func _physics_process(_delta):
-	move_and_slide()
-	
 	# adjust player sprite direction
 	if velocity.x > 0:
 		$AnimatedSprite2D.flip_h = false
 	elif velocity.x < 0:
 		$AnimatedSprite2D.flip_h = true
+		
+	move_and_slide()
 
 # externally called functions
 func _show_speech_bubble(display_text):

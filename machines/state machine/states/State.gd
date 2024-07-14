@@ -13,7 +13,7 @@ signal Transition
 var GRAVITY = ProjectSettings.get_setting("physics/2d/default_gravity")
 var SPEED = 100
 
-const DEFAULT_SPEED = 130
+const DEFAULT_SPEED = 100
 const FAST_SPEED = 180
 const ROLL_DISTANCE = 90
 const JUMP_VELOCITY = -180

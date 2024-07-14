@@ -16,7 +16,7 @@ func _on_exit():
 	next_state = move_state
 	
 func _update_physics(current_direction: Vector2i, next_direction: Vector2i, current_path: Array[Vector2i]):
-	if current_direction.x != 0:
+	if current_direction.x != 0 || current_path.size() == 0:
 		# exit climb-state
 		emit_signal("Transition")
 	else:
